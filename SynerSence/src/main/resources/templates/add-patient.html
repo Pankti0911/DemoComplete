@@ -162,48 +162,50 @@
         </div>
 
         <!-- CUSTOM FIELDS -->
-        <h3>Additional Information</h3>
+       <!-- CUSTOM FIELDS -->
+<h3>Additional Information</h3>
 
-        <div th:each="field : ${customFields}" class="form-group full-width">
+<div th:each="field : ${customFields}" class="form-group full-width">
 
-            <label th:text="${field.labelName}"></label>
+    <label th:text="${field.labelName}"></label>
 
-            <!-- TEXT -->
-            <input th:if="${field.dataType == 'TEXT'}"
-                   type="text"
-                   th:name="'custom_' + ${field.id}"
-                   />
+    <!-- TEXT -->
+    <input th:if="${field.dataType == 'TEXT'}"
+           type="text"
+           th:name="'custom_' + ${field.id}"
+           th:required="${field.mandatory}" />
 
-            <!-- NUMBER -->
-            <input th:if="${field.dataType == 'NUMBER'}"
-                   type="number"
-                   th:name="'custom_' + ${field.id}"
-                    />
+    <!-- NUMBER -->
+    <input th:if="${field.dataType == 'NUMBER'}"
+           type="number"
+           th:name="'custom_' + ${field.id}"
+           th:required="${field.mandatory}" />
 
-            <!-- EMAIL -->
-            <input th:if="${field.dataType == 'EMAIL'}"
-                   type="email"
-                   th:name="'custom_' + ${field.id}"
-                    />
+    <!-- EMAIL -->
+    <input th:if="${field.dataType == 'EMAIL'}"
+           type="email"
+           th:name="'custom_' + ${field.id}"
+           th:required="${field.mandatory}" />
 
-            <!-- DATE -->
-            <input th:if="${field.dataType == 'DATE'}"
-                   type="date"
-                   th:name="'custom_' + ${field.id}"
-                    />
+    <!-- DATE & TIME -->
+    <input th:if="${field.dataType == 'DATE_TIME'}"
+           type="datetime-local"
+           th:name="'custom_' + ${field.id}"
+           th:required="${field.mandatory}" />
 
-            <!-- DROPDOWN -->
-            <select th:if="${field.dataType == 'DROPDOWN'}"
-                    th:name="'custom_' + ${field.id}"
-                    />
-                <option value="">Select</option>
-                <option th:each="opt : ${#strings.arraySplit(field.options, ',')}"
-                        th:value="${opt}"
-                        th:text="${opt}">
-                </option>
-            </select>
+    <!-- DROPDOWN -->
+    <select th:if="${field.dataType == 'DROPDOWN'}"
+            th:name="'custom_' + ${field.id}"
+            th:required="${field.mandatory}">
+        <option value="">Select</option>
+        <option th:each="opt : ${#strings.arraySplit(field.options, ',')}"
+                th:value="${opt}"
+                th:text="${opt}">
+        </option>
+    </select>
 
-        </div>
+</div>
+
 
         <button type="submit">Save Patient</button>
 
@@ -221,4 +223,5 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
 
