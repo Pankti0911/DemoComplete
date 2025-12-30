@@ -8,6 +8,8 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <link rel="stylesheet" th:href="@{/css/index.css}">
+	<script th:src="@{/js/offline.js}"></script>
+	<link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
@@ -217,6 +219,15 @@
 
 <!-- JS -->
 <script th:src="@{/js/index.js}"></script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('PWA Service Worker registered'))
+      .catch(err => console.error('SW registration failed', err));
+  });
+}
+</script>
 </body>
+
 </html>
