@@ -6,6 +6,8 @@
 
     <!-- ✅ Correct Spring Boot CSS path -->
     <link rel="stylesheet" th:href="@{/css/field-customize.css}">
+    <link rel="manifest" href="/manifest.json">
+   <script th:src="@{/js/offline.js}"></script>
 </head>
 <body>
 
@@ -88,6 +90,15 @@
 
     </main>
 </div>
-
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('PWA Service Worker registered'))
+      .catch(err => console.error('SW registration failed', err));
+  });
+}
+</script>
 </body>
 </html>
+
