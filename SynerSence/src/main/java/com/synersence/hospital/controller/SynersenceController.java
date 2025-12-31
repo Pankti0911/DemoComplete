@@ -33,35 +33,34 @@ public class SynersenceController {
     }
 
     // ================= DASHBOARD =================
-    @GetMapping("/")
-    public String home(Model model) {
+   @GetMapping("/")
+public String home(Model model) {
 
-        List<PatientMaster> patients = patientService.getAllPatients();
-        List<FieldCustomization> fields = fieldService.getAllFields();
+    List<PatientMaster> patients = patientService.getAllPatients();
+    List<FieldCustomization> fields = fieldService.getAllFields();
 
-        // patientId -> (fieldId -> value)
-        Map<String, Map<Long, String>> customValues = new HashMap<>();
+    Map<String, Map<Long, String>> customValues = new HashMap<>();
 
-        for (PatientMaster patient : patients) {
+    for (PatientMaster patient : patients) {
 
-            Map<Long, String> fieldValueMap = new HashMap<>();
+        Map<Long, String> fieldValueMap = new HashMap<>();
 
-            List<PatientCustomFieldValue> values =
-                    customValueRepo.findByPatientId(patient.getPatientId());
+        List<PatientCustomFieldValue> values =
+                customValueRepo.findByPatient(patient);
 
-            for (PatientCustomFieldValue v : values) {
-                fieldValueMap.put(v.getField().getId(), v.getFieldValue());
-            }
-
-            customValues.put(patient.getPatientId(), fieldValueMap);
+        for (PatientCustomFieldValue v : values) {
+            fieldValueMap.put(v.getField().getId(), v.getFieldValue());
         }
 
-        model.addAttribute("patients", patients);
-        model.addAttribute("customFields", fields);
-        model.addAttribute("customValues", customValues);
-
-        return "index";
+        customValues.put(patient.getPatientId(), fieldValueMap);
     }
+
+    model.addAttribute("patients", patients);
+    model.addAttribute("customFields", fields);
+    model.addAttribute("customValues", customValues);
+
+    return "index";
+}
 
     // ================= ADD PATIENT =================
     @GetMapping("/patients/new")
@@ -114,4 +113,5 @@ public String savePatient(
         return "field-customize";
     }
 }
+
 
