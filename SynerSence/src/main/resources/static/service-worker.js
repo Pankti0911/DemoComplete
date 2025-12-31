@@ -1,62 +1,40 @@
-const CACHE_NAME = "synersence-cache-v1";
+const CACHE = "synersence-v2";
 
-const FILES_TO_CACHE = [
+const STATIC_FILES = [
   "/",
   "/patients/new",
   "/settings",
   "/settings/customize",
-
-  // CSS
   "/css/index.css",
   "/css/setting.css",
   "/css/field-customize.css",
-
-  // JS
-  "/js/index.js",
-  "/js/setting.js",
-
-  // PWA
+  "/js/offline.js",
   "/manifest.json"
 ];
 
-// ================= INSTALL =================
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(FILES_TO_CACHE);
-    })
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => cache.addAll(STATIC_FILES))
   );
   self.skipWaiting();
 });
 
-// ================= ACTIVATE =================
-self.addEventListener("activate", event => {
-  event.waitUntil(
+self.addEventListener("activate", e => {
+  e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      )
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
-// ================= FETCH =================
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Cache new requests dynamically
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, clone);
-        });
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+self.addEventListener("fetch", e => {
+  // 🚫 NEVER cache POST
+  if (e.request.method !== "GET") return;
+
+  e.respondWith(
+    caches.match(e.request).then(res => {
+      return res || fetch(e.request);
+    })
   );
 });
