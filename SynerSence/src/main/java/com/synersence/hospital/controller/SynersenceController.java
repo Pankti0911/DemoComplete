@@ -72,30 +72,29 @@ public class SynersenceController {
     }
 
     // ================= SAVE PATIENT =================
-    @PostMapping("/patients/save")
-    public String savePatient(
-            @ModelAttribute PatientMaster patient,
-            HttpServletRequest request) {
+  @PostMapping("/patients/save")
+public String savePatient(
+        @ModelAttribute PatientMaster patient,
+        HttpServletRequest request) {
 
-        patientService.savePatient(patient);
+    patientService.savePatient(patient);
 
-        List<FieldCustomization> fields = fieldService.getAllFields();
+    List<FieldCustomization> fields = fieldService.getAllFields();
 
-        for (FieldCustomization field : fields) {
-            String value = request.getParameter("custom_" + field.getId());
+    for (FieldCustomization field : fields) {
+        String value = request.getParameter("custom_" + field.getId());
 
-            if (value != null && !value.trim().isEmpty()) {
-                PatientCustomFieldValue v = new PatientCustomFieldValue();
-                v.setPatientId(patient.getPatientId());
-                v.setField(field);
-                v.setFieldValue(value);
-                customValueRepo.save(v);
-            }
+        if (value != null && !value.trim().isEmpty()) {
+            PatientCustomFieldValue v = new PatientCustomFieldValue();
+            v.setPatient(patient);   // ✅ FIX
+            v.setField(field);
+            v.setFieldValue(value);
+            customValueRepo.save(v);
         }
-
-        return "redirect:/";
     }
 
+    return "redirect:/";
+}
     // ================= SETTINGS =================
     @GetMapping("/settings")
     public String settings(Model model) {
@@ -115,3 +114,4 @@ public class SynersenceController {
         return "field-customize";
     }
 }
+
