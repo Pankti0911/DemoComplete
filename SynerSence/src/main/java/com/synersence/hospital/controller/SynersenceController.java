@@ -33,7 +33,7 @@ public class SynersenceController {
     }
 
     // ================= DASHBOARD =================
-   @GetMapping("/")
+  @GetMapping("/")
 public String home(Model model) {
 
     List<PatientMaster> patients = patientService.getAllPatients();
@@ -46,7 +46,7 @@ public String home(Model model) {
         Map<Long, String> fieldValueMap = new HashMap<>();
 
         List<PatientCustomFieldValue> values =
-                customValueRepo.findByPatient(patient);
+                customValueRepo.findByPatient(patient); // ✅ FIX
 
         for (PatientCustomFieldValue v : values) {
             fieldValueMap.put(v.getField().getId(), v.getFieldValue());
@@ -62,6 +62,7 @@ public String home(Model model) {
     return "index";
 }
 
+
     // ================= ADD PATIENT =================
     @GetMapping("/patients/new")
     public String addPatientPage(Model model) {
@@ -71,29 +72,34 @@ public String home(Model model) {
     }
 
     // ================= SAVE PATIENT =================
-  @PostMapping("/patients/save")
+@PostMapping("/patients/save")
+@Transactional
 public String savePatient(
         @ModelAttribute PatientMaster patient,
         HttpServletRequest request) {
 
-    patientService.savePatient(patient);
+    PatientMaster savedPatient = patientService.saveAndFlush(patient);
 
     List<FieldCustomization> fields = fieldService.getAllFields();
 
     for (FieldCustomization field : fields) {
+
         String value = request.getParameter("custom_" + field.getId());
 
         if (value != null && !value.trim().isEmpty()) {
+
             PatientCustomFieldValue v = new PatientCustomFieldValue();
-            v.setPatient(patient);   // ✅ FIX
+            v.setPatient(savedPatient);   // ✅ managed entity
             v.setField(field);
             v.setFieldValue(value);
+
             customValueRepo.save(v);
         }
     }
 
     return "redirect:/";
 }
+
     // ================= SETTINGS =================
     @GetMapping("/settings")
     public String settings(Model model) {
@@ -113,5 +119,6 @@ public String savePatient(
         return "field-customize";
     }
 }
+
 
 
