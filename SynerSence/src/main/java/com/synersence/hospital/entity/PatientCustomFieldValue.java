@@ -10,12 +10,12 @@ public class PatientCustomFieldValue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🔗 FK → patient_master.patient_id
+    // 🔗 FK → patient_master.patient_id (varchar)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private PatientMaster patient;
 
-    // 🔗 FK → field_customization.id
+    // 🔗 FK → field_customization.id (bigint)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_id", nullable = false)
     private FieldCustomization field;
