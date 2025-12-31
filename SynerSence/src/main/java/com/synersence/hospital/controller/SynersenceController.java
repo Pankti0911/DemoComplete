@@ -12,6 +12,8 @@ import com.synersence.hospital.entity.*;
 import com.synersence.hospital.repository.PatientCustomFieldValueRepository;
 import com.synersence.hospital.service.FieldCustomizationService;
 import com.synersence.hospital.service.PatientMasterService;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -119,6 +121,7 @@ public String savePatient(
         return "field-customize";
     }
 }
+
 
 
 
