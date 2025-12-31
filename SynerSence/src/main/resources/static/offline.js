@@ -1,29 +1,41 @@
-// offline.js
-
 window.addEventListener("offline", () => {
-    alert("⚠️ You are offline. Data will be saved locally.");
+  alert("⚠️ You are offline. Data will be saved locally.");
 });
 
 window.addEventListener("online", () => {
-    alert("✅ You are back online. Pending data will be synced.");
+  alert("✅ Back online. Syncing data...");
+  syncOfflineData();
 });
 
-// Example: Save patient form offline
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector("form");
+  const form = document.querySelector("form");
+  if (!form) return;
 
-    if (!form) return;
+  form.addEventListener("submit", e => {
+    if (!navigator.onLine) {
+      e.preventDefault();
 
-    form.addEventListener("submit", function (e) {
-        if (!navigator.onLine) {
-            e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
+      queue.push(data);
 
-            const data = Object.fromEntries(new FormData(form));
-            const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
-            queue.push(data);
-            localStorage.setItem("offlineQueue", JSON.stringify(queue));
-
-            alert("📦 Data saved locally. It will sync when online.");
-        }
-    });
+      localStorage.setItem("offlineQueue", JSON.stringify(queue));
+      alert("📦 Saved offline");
+    }
+  });
 });
+
+function syncOfflineData() {
+  const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
+  if (queue.length === 0) return;
+
+  queue.forEach(data => {
+    fetch("/patients/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(data)
+    });
+  });
+
+  localStorage.removeItem("offlineQueue");
+}
