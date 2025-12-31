@@ -3,39 +3,32 @@ window.addEventListener("offline", () => {
 });
 
 window.addEventListener("online", () => {
-  alert("✅ Back online. Syncing data...");
-  syncOfflineData();
+  alert("✅ You are back online. Pending data can be synced.");
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("form");
+
   if (!form) return;
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", function (e) {
+
+    // 🚫 FULLY BLOCK DEFAULT BEHAVIOR
     if (!navigator.onLine) {
       e.preventDefault();
+      e.stopImmediatePropagation();
 
-      const data = Object.fromEntries(new FormData(form));
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
       const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
       queue.push(data);
-
       localStorage.setItem("offlineQueue", JSON.stringify(queue));
-      alert("📦 Saved offline");
+
+      alert("📦 Saved locally. UI will NOT disappear.");
+
+      // ❗ IMPORTANT: stop browser navigation completely
+      return false;
     }
-  });
+  }, true); // 🔥 CAPTURE PHASE
 });
-
-function syncOfflineData() {
-  const queue = JSON.parse(localStorage.getItem("offlineQueue") || "[]");
-  if (queue.length === 0) return;
-
-  queue.forEach(data => {
-    fetch("/patients/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(data)
-    });
-  });
-
-  localStorage.removeItem("offlineQueue");
-}
