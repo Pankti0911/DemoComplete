@@ -80,25 +80,21 @@ public String savePatient(
         @ModelAttribute PatientMaster patient,
         HttpServletRequest request) {
 
-    PatientMaster savedPatient = patientService.saveAndFlush(patient);
+    patientService.savePatient(patient);
 
     List<FieldCustomization> fields = fieldService.getAllFields();
 
     for (FieldCustomization field : fields) {
-
         String value = request.getParameter("custom_" + field.getId());
 
         if (value != null && !value.trim().isEmpty()) {
-
             PatientCustomFieldValue v = new PatientCustomFieldValue();
-            v.setPatient(savedPatient);   // ✅ managed entity
+            v.setPatient(patient);
             v.setField(field);
             v.setFieldValue(value);
-
             customValueRepo.save(v);
         }
     }
-
     return "redirect:/";
 }
 
@@ -121,6 +117,7 @@ public String savePatient(
         return "field-customize";
     }
 }
+
 
 
 
